@@ -1,0 +1,29 @@
+{
+  "name": "numenode-container",
+  "version": "1.0.0",
+  "description": "IOC container",
+  "main": "index.js",
+  "scripts": {
+    "test": "node node_modules/.bin/mocha tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lumenode/container.git"
+  },
+  "keywords": [
+    "ioc"
+  ],
+  "author": "Iurii Krevnyi",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lumenode/container/issues"
+  },
+  "homepage": "https://github.com/lumenode/container#readme",
+  "dependencies": {
+    "lodash": "^3.10.1"
+  },
+  "devDependencies": {
+    "mocha": "^2.3.4",
+    "should": "^8.0.2"
+  }
+}
