@@ -1,0 +1,6 @@
+node_modules
+*.sublime-workspace
+.log
+!.gitkeep
+.DS_Store
+.editorconfig

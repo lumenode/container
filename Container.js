@@ -165,7 +165,7 @@ function Container() {
    * @return Array
    */
   this.parseFunctionArguments = function (concrete) {
-    var args = concrete.toString().match(/^function\s*[^\(]*\(\s*([^\)]*)\)/m);
+    var args = concrete.toString().match(/^(?:function)?\s*[^\(]*\(\s*([^\)]*)\)/m);
     var dependencies = [];
 
     if (args === null || args.length < 1) {
