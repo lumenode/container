@@ -1,6 +1,6 @@
 {
   "name": "numenode-container",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "IOC container",
   "main": "index.js",
   "scripts": {
