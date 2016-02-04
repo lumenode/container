@@ -19,6 +19,7 @@ describe('<Unit Test>', function () {
     it('binds items to IoC container', function () {
       ioc.bind('hash', HasherInstance);
       ioc.bind('config', ConfigInstance);
+      ioc.bind('class', ClassInstance);
 
       // Assert
       var hasher = ioc.make('hash');
@@ -28,15 +29,24 @@ describe('<Unit Test>', function () {
       var config = ioc.make('config');
       config.should.be.instanceof(ConfigInstance);
       config.grab().should.be.equal('Grab config');
+
+      var classInstance = ioc.make('class');
+      classInstance.should.be.instanceof(ClassInstance);
+      classInstance.foo().should.be.equal('from ClassInstance');
     });
 
     it('injects dependencies', function () {
       ioc.bind('config', ConfigInstance);
       ioc.bind('star', StarInstance);
+      ioc.bind('class', ClassInstance2);
 
       var star = ioc.make('star');
       star.should.be.instanceof(StarInstance);
       star.config().grab().should.be.equal('Grab config');
+
+      var classInstance = ioc.make('class');
+      classInstance.should.be.instanceof(ClassInstance2);
+      classInstance.config().grab().should.be.equal('Grab config');
     });
 
     it('removes all dependencies from own cache', function () {
@@ -84,7 +94,16 @@ describe('<Unit Test>', function () {
         return new StarInstance(config);
       });
 
+      ioc.bind('class', class {
+        constructor() {
+          var config = new ConfigInstance;
+
+          return new StarInstance(config);
+        }
+      });
+
       ioc.make('star').config().grab().should.equal('Grab config');
+      ioc.make('class').config().grab().should.equal('Grab config');
     });
 
     it('removes instances from ioc cache', function () {
@@ -101,17 +120,25 @@ describe('<Unit Test>', function () {
       ioc.bind('hash', HasherInstance);
       ioc.alias('hash', 'hasher');
 
+      ioc.bind('class', ClassInstance);
+      ioc.alias('class', 'class-alias');
+
       ioc.make('hasher').make().should.be.eql('Make some hashing');
+      ioc.make('class-alias').foo().should.be.eql('from ClassInstance');
     });
 
     it('stores instances', function () {
       var hash = new HasherInstance;
+      var classInstance = new ClassInstance;
       
       ioc.instance('foo', hash);
       ioc.make('foo').make().should.be.eql('Make some hashing');
 
       ioc.instance('foo', 'bar');
       ioc.make('foo').should.be.eql('bar');
+
+      ioc.instance('classInstance', classInstance);
+      ioc.make('classInstance').foo().should.be.eql('from ClassInstance');
     });
 
     it('dynamically rebounds instances', function () {
@@ -142,6 +169,22 @@ describe('<Unit Test>', function () {
       first.should.be.equal(second);
     });
 
+    it('can share class expressions', function () {
+      ioc.singleton('class', class {
+        constructor() {
+          return {
+            hello: 'world',
+            world: 'hello'
+          }
+        }
+      });
+
+      var first = ioc.make('class');
+      var second = ioc.make('class');
+
+      first.should.be.equal(second);
+    });
+
     it('can not register already registered instance using bindIf() method', function () {
       ioc.bindIf('foo', function() {
         return {hello: 'world'};
@@ -163,7 +206,7 @@ describe('<Unit Test>', function () {
       }, {id: 'new id'});
     });
 
-    it('resolves class with parameters', function () {
+    it('resolves class (functional) with parameters', function () {
       ioc.instance('foo', 'bar');
       ioc.instance('bar', 'baz');
 
@@ -182,7 +225,28 @@ describe('<Unit Test>', function () {
       result.foo.should.be.eql('bar');
     });
 
-    it('can resolve class@method call via AT sign', function () {
+    it('resolves class (non-functional) with parameters', function () {
+      ioc.instance('foo', 'bar');
+      ioc.instance('bar', 'baz');
+
+      ioc.bind('testing', class {
+        constructor(bar, id, foo) {
+          this.bar = bar;
+          this.id = id;
+          this.foo = foo;
+        }
+      });
+
+      var result = ioc.make('testing', {
+        id: 'some id'
+      });
+
+      result.bar.should.be.eql('baz');
+      result.id.should.be.eql('some id');
+      result.foo.should.be.eql('bar');
+    });
+
+    it('can resolve class@method (functional) call via AT sign', function () {
       ioc.instance('foo', 'bar');
       ioc.instance('newfoo', 'baz');
 
@@ -213,6 +277,60 @@ describe('<Unit Test>', function () {
       result.id.should.be.eql('test id');
       result.title.should.be.eql('test title');
     });
+
+    it('can resolve class@method (non-functional) call via AT sign', function () {
+      ioc.instance('foo', 'bar');
+      ioc.instance('newfoo', 'baz');
+
+      ioc.bind('TestFunctionAtSignCall', class {
+        
+        constructor(title, foo) {
+          this.foo = foo;
+          this.title = title;
+        }
+
+        sayHello(id, newfoo) {
+          this.id = id;
+          this.newfoo = newfoo;
+
+          return {
+            foo: this.foo,
+            newfoo: this.newfoo,
+            id: this.id,
+            title: this.title
+          }
+        }
+
+      });
+
+      var result = ioc.call('TestFunctionAtSignCall@sayHello', {
+        id: 'test id',
+        title: 'test title'
+      });
+
+      result.foo.should.be.eql('bar');
+      result.newfoo.should.be.eql('baz');
+      result.id.should.be.eql('test id');
+      result.title.should.be.eql('test title');
+    });
+
+    class ClassInstance {
+      foo() {
+        return 'from ClassInstance';
+      }
+    }
+
+    class ClassInstance2 {
+
+      constructor(config) {
+        this.Config = config;
+      }
+
+      config() {
+        return this.Config;
+      }
+
+    }
 
     /*
      * Config

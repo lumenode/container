@@ -290,7 +290,7 @@ function Container() {
   this.executeCallable = function(callback, dependencies) {
     if (typeof callback === 'function') {
       return callback.apply(callback, dependencies);
-    };
+    }
 
     var instance = callback[0];
     var method = callback[1];
