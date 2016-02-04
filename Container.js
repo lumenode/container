@@ -1,5 +1,7 @@
 'use strict';
 
+const parseFunction = require('parse-function');
+
 class Container {
 
   constructor() {
@@ -162,14 +164,17 @@ class Container {
    * @return Array
    */
   parseFunctionArguments(concrete) {
-    let args = concrete.toString().match(/^(?:function)?\s*[^\(]*\(\s*([^\)]*)\)/m);
+    let fixture = concrete.toString();
     let dependencies = [];
+    let deps = [];
 
-    if (args === null || args.length < 1) {
-      return [];
+    // That code 
+    if (this.isConstructorOrClassMethod(fixture)) {
+      deps = this.getConstructorOrClassMethodParameters(fixture);
+    } else {
+      deps = parseFunction(concrete.toString()).args;
     }
-    let deps = args[1].replace(/\s/g, '').split(',');
-
+    
     for (let i = 0; i < deps.length; i++) {
       if (deps[i].length > 0) {
         dependencies.push(deps[i]);
@@ -177,6 +182,20 @@ class Container {
     }
 
     return dependencies;
+  }
+
+  getConstructorOrClassMethodParameters(fixture) {
+    let args = fixture.match(/^(?:function)?\s*[^\(]*\(\s*([^\)]*)\)/m);
+
+    if (args === null || args.length < 1) {
+      return [];
+    }
+
+    return args[1].replace(/\s/g, '').split(',');
+  }
+
+  isConstructorOrClassMethod(fixture) {
+    return !!fixture.match(/(?:^class|^(?!function)(?=\w+))/);
   }
 
   /*

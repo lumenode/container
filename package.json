@@ -20,7 +20,8 @@
   },
   "homepage": "https://github.com/lumenode/container#readme",
   "dependencies": {
-    "lodash": "^3.10.1"
+    "lodash": "^3.10.1",
+    "parse-function": "^2.3.0"
   },
   "devDependencies": {
     "mocha": "^2.3.4",
