@@ -4,3 +4,4 @@ node_modules
 !.gitkeep
 .DS_Store
 .editorconfig
+.jsbeautifyrc
