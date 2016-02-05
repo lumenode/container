@@ -1,5 +1,5 @@
 {
-  "name": "numenode-container",
+  "name": "lumenode-container",
   "version": "1.0.3",
   "description": "IOC container",
   "main": "index.js",
