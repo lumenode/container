@@ -1,6 +1,6 @@
 {
   "name": "lumenode-container",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "IOC container",
   "main": "index.js",
   "scripts": {
