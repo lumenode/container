@@ -185,7 +185,8 @@ class Container {
   }
 
   getConstructorOrClassMethodParameters(fixture) {
-    let args = fixture.match(/^(?:function)?\s*[^\(]*\(\s*([^\)]*)\)/m);
+    fixture = fixture.replace(/(?:\r\n|\r|\n)/g, '');
+    let args = fixture.match(/^(?:(?=class)(?=.*constructor)|(?=function)|(?!.*class|.*function)).*?\(\s*([^\)]*)\)/i);
 
     if (args === null || args.length < 1) {
       return [];

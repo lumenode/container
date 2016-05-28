@@ -312,6 +312,16 @@ describe('<Unit Test>', () => {
       result.title.should.be.eql('test title');
     });
 
+    it('resolves only constructor arguments on instantiation', function () {
+      ioc.instance('someKey', 'someValue');
+
+      ioc.singleton('demo', class {
+        make(json) {}
+      });
+
+      ioc.make('demo');
+    });
+
     class ClassInstance {
       foo() {
         return 'from ClassInstance';
