@@ -108,6 +108,11 @@ class Container {
       let className = concrete.replace(/\+/, '');
       let module = require(className);
 
+      // ES6 compability
+      if (!module.ignoreES6DefaultOperator && module.default) {
+        module = module.default;
+      }
+
       concrete = module;
     }
 
