@@ -59,7 +59,7 @@ class Container {
     // just return an existing instance instead of instantiating new instances
     // so the developer can keep using the same objects instance every time.
     if (this.instances[abstract]) {
-      return this.instances[abstract];
+      return this.compareWithES6(this.instances[abstract]);
     }
 
     let concrete = this.getConcrete(abstract);
@@ -106,12 +106,7 @@ class Container {
   build(concrete, parameters) {
     if (this.needAutoInject(concrete)) {
       let className = concrete.replace(/\+/, '');
-      let module = require(className);
-
-      // ES6 compability
-      if (!module.ignoreES6DefaultOperator && module.default) {
-        module = module.default;
-      }
+      let module = this.compareWithES6(require(className));
 
       concrete = module;
     }
@@ -398,6 +393,20 @@ class Container {
    */
   dropStaleInstances(abstract) {
     delete this.instances[abstract];
+  }
+
+  /**
+   * Fix ES6 syntax for automatic resolution.
+   *
+   * @param  {Object} instance Instance needed to be resolved
+   * @return {Object}          Reolved instance
+   */
+  compareWithES6(instance) {
+    if (!instance.ignoreES6DefaultOperator && instance.default) {
+      return instance.default;
+    }
+
+    return instance;
   }
 
   /*
